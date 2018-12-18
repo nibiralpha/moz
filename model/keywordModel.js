@@ -43,6 +43,10 @@ let aggregate = (query, callback) => {
     keywordModel.aggregate(query, callback);
 }
 
+let distinct = (field, query, options, callback) => {
+    keywordModel.distinct(field, query, options, callback);
+}
+
 module.exports = {
     findOneById,
     find,
@@ -53,5 +57,6 @@ module.exports = {
     deleteConversation,
     deleteMessage,
     isExistDocument,
-    aggregate
+    aggregate,
+    distinct
 }

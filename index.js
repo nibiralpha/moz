@@ -5,6 +5,7 @@ const dataModel = require('./model/dataModel');
 const keywordModel = require('./model/keywordModel');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fs = require('fs');
 
 io.on('connection', data => {
     console.log();
@@ -20,25 +21,27 @@ io.on('disconnect', data => {
 
 app.use(cors());
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 1000000 }));
 
 app.post('/app', function (req, res) {
 
-    let data = req.body.resources;
-    console.log(data);
+    let data = req.body.resources.dataInfo;
+    // console.log(data);
+    fs.readFile(__dirname + '/tmp/id', 'utf8', function (err, content) {
+        if (err) throw err;
 
-    dataModel.create(data, (err, succ) => {
-        if (err) console.log(err);
+        dataModel.create(data, (errD, succ) => {
+            if (errD){
+                console.log(errD);
+            }
 
-        console.log(succ);
+            keywordModel.update({ "_id": content }, { c: true }, (errC, updateC) => {
+                if (errC) console.log(errC);
+                return res.status(200).json({ id: content });
+            })
+        });
     });
-    // dataModel.insertMany(data, (err, succ) => {
-    //     if (err) console.log(err);
-
-    //     console.log(succ);
-    // });
-    // res.send('hello world')
 })
 
 app.post('/keyword', function (req, res) {
@@ -52,7 +55,29 @@ app.post('/keyword', function (req, res) {
 
         // console.log(succ);
     });
-    res.send('hello world')
+    // res.send('hello world')
+})
+
+app.get('/home', function (req, res) {
+    // let data = req.body;
+    keywordModel.find({ c: false }, (err, keywors) => {
+        if (err) throw err;
+        res.status(200).json({ keywords: keywors });
+    })
+})
+
+app.post('/saveid', function (req, res) {
+
+    let data = req.body;
+    // console.log(data);
+
+    fs.writeFile(__dirname + "/tmp/id", data.id, function (err) {
+        if (err) {
+            console.log(err);
+            return res.status(200).json({ id: null });
+        }
+        return res.status(200).json({ id: data.id });
+    });
 })
 
 server.listen(3000);
