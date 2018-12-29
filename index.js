@@ -32,7 +32,7 @@ app.post('/app', function (req, res) {
         if (err) throw err;
 
         dataModel.create(data, (errD, succ) => {
-            if (errD){
+            if (errD) {
                 console.log(errD);
             }
 
@@ -50,12 +50,23 @@ app.post('/keyword', function (req, res) {
     // console.log(data);
     // console.log(data.length);
 
-    keywordModel.insertMany(data, (err, succ) => {
-        if (err) console.log(err);
+    keywordModel.find({}, { keyword: 1, _id: 0 }, (err, allkeywords) => {
+        // console.log("allkeywords", allkeywords);
+        // console.log("data", data);
 
-        // console.log(succ);
-    });
-    // res.send('hello world')
+        mappedKey = allkeywords.map(key => key.keyword)
+        uniqKey = data.filter(function (item) {
+            return !mappedKey.includes(item.keyword);
+        })
+
+        // console.log("uniqKey", uniqKey);
+        
+        
+        keywordModel.insertMany(uniqKey, (err, succ) => {
+            if (err) console.log(err);
+        });
+
+    })
 })
 
 app.get('/home', function (req, res) {

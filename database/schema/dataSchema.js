@@ -7,6 +7,7 @@ let Schema = mongoose.Schema;
 var dataSchema = new Schema({
     keyword: String,
     vol: Number,
+    hasMore: Boolean,
     data: [
         {
             pa: Number,
