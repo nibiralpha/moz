@@ -8,15 +8,15 @@ const cors = require('cors');
 const fs = require('fs');
 
 io.on('connection', data => {
-    console.log();
+    // console.log();
 });
 
 io.on('event', data => {
-    console.log(data);
+    // console.log(data);
 });
 
 io.on('disconnect', data => {
-    console.log(data);
+    // console.log(data);
 });
 
 app.use(cors());
@@ -47,31 +47,29 @@ app.post('/app', function (req, res) {
 app.post('/keyword', function (req, res) {
 
     let data = req.body.keywords;
-    // console.log(data);
-    // console.log(data.length);
+    // console.log(req.body);
+    if(data !== undefined){
+    
+	    keywordModel.find({}, { keyword: 1, _id: 0 }, (err, allkeywords) => {
+	        
+	        mappedKey = allkeywords.map(key => key.keyword)
+	        uniqKey = data.filter(function (item) {
+	            return !mappedKey.includes(item.keyword);
+	        })
+	        
+	        keywordModel.insertMany(uniqKey, (err, succ) => {
+	            if (err) console.log(err);
+	        });
 
-    keywordModel.find({}, { keyword: 1, _id: 0 }, (err, allkeywords) => {
-        // console.log("allkeywords", allkeywords);
-        // console.log("data", data);
-
-        mappedKey = allkeywords.map(key => key.keyword)
-        uniqKey = data.filter(function (item) {
-            return !mappedKey.includes(item.keyword);
-        })
-
-        // console.log("uniqKey", uniqKey);
-        
-        
-        keywordModel.insertMany(uniqKey, (err, succ) => {
-            if (err) console.log(err);
-        });
-
-    })
+	    })
+	}
 })
 
 app.get('/home', function (req, res) {
     // let data = req.body;
     keywordModel.find({ c: false }, (err, keywors) => {
+    	// console.log(keywors);
+
         if (err) throw err;
         res.status(200).json({ keywords: keywors });
     })
