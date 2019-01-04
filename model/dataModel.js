@@ -10,6 +10,10 @@ let find = (query, projections, callback) => {
     dataModel.find(query, projections, callback);
 }
 
+let findWithOptions = (query, options, projections, callback) => {
+    dataModel.find(query, options, projections, callback);
+}
+
 let insertMany = (query, callback) => {
     dataModel.insertMany(query, callback);
 }
@@ -46,6 +50,7 @@ let aggregate = (query, callback) => {
 module.exports = {
     findOneById,
     find,
+    findWithOptions,
     insertMany,
     create,
     update,
